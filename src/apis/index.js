@@ -6,3 +6,4 @@ export const fetchBoardDetailsAPI = async (boardId) => {
   // axios sẽ trả về property của nó là data
   return response.data
 }
+
