@@ -14,9 +14,9 @@ import { CSS } from '@dnd-kit/utilities'
 function Card({ card }) {
   const {
     attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: card._id,
-    data: { ...card }
-  })
+      id: card._id,
+      data: { ...card }
+    })
 
   const dndKitCardStyles = {
     // dành cho sensor defaut dạng pointerSensor
@@ -29,8 +29,13 @@ function Card({ card }) {
   }
 
   // bỏ phần padding của <CardActions/>
-  const shouldShowCardActions = () => {
-    return !!card?.memberIds.length || !!card?.comments.length || !!card?.attachments.length
+  const shouldShowCardActions = (card) => {
+    // return !!card?.memberIds.length || !!card?.comments.length || !!card?.attachments.length
+    return (
+      !!card?.memberIds?.length ||
+      !!card?.comments?.length ||
+      !!card?.attachments?.length
+    );
   }
   return (
     <MuiCard
