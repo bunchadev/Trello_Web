@@ -12,11 +12,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
 function Card({ card }) {
-  const {
-    attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-      id: card._id,
-      data: { ...card }
-    })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card._id, data: { ...card } })
 
   const dndKitCardStyles = {
     // dành cho sensor defaut dạng pointerSensor
@@ -35,7 +31,7 @@ function Card({ card }) {
       !!card?.memberIds?.length ||
       !!card?.comments?.length ||
       !!card?.attachments?.length
-    );
+    )
   }
   return (
     <MuiCard
@@ -44,7 +40,9 @@ function Card({ card }) {
         cursor: 'pointer',
         boxShadow: '0 1px 1px rgba(0, 0, 0, 0.2)',
         overflow: 'unset',
-        display: card?.FE_PlaceholderCard ? 'none' : 'block'
+        display: card?.FE_PlaceholderCard ? 'none' : 'block',
+        border: '1px solid transparent',
+        '&:hover': { borderColor: (theme) => theme.palette.primary.main }
       }}>
       {card?.cover && <CardMedia sx={{ height: 140 }} image={card?.cover} />}
 
