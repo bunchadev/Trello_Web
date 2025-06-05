@@ -189,6 +189,7 @@ function Column({ column }) {
                 size='small'
                 variant='outlined'
                 autoFocus
+                data-no-dnd="true"
                 // thay đổi value
                 value={newCardTitle}
                 onChange={(e) => setNewCardTitle(e.target.value)}
