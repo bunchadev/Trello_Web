@@ -9,19 +9,25 @@ import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 import { toast } from 'react-toastify'
 
-function ListColumns({ columns }) {
+function ListColumns({ columns, createNewColumn, createNewCard }) {
   const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
 
   const [newColumnTitle, setNewColumnTitle] = useState('')
-  const addNewColumn = () => {
+  const addNewColumn = async () => {
     if (!newColumnTitle) {
       toast.error('Please enter column title')
       return
     }
-
-    // console.log(newColumnTitle)
-    // gọi api
+    // tạo dữ liệu column để gọi API
+    const newColumnData = {
+      title: newColumnTitle
+    }
+    /**
+     * gọi lên props function createNewColumn nằm ở component cha cao nhất (boards/_id.jsx)
+     * lưu ý sau học cao sẽ đưa dữ liệu ra ngoài redux global store và lúc đấy có thể gọi luôn API ở đây là xong
+     */
+    await createNewColumn(newColumnData)
 
     // đóng trang thái thêm column mới và clear input
     toggleOpenNewColumnForm()
@@ -43,7 +49,7 @@ function ListColumns({ columns }) {
         // thanh scroll thẳng với list card
         '&::-webkit-scrollbar-track': { m: 2 }
       }}>
-        {columns?.map(column => <Column key={column._id} column={column} />)}
+        {columns?.map(column => <Column key={column._id} column={column} createNewCard={createNewCard} />)}
 
         {/* add new column */}
         {!openNewColumnForm
