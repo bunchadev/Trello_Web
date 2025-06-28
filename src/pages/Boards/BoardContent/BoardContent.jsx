@@ -32,7 +32,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
 
-function BoardContent({ board, createNewColumn, createNewCard }) {
+function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
   // const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
 
   // yêu cầu di chuyển chuột 10px thì mới kích hoạt event, fix trường hợp click bị gọi event
@@ -260,11 +260,18 @@ function BoardContent({ board, createNewColumn, createNewCard }) {
         const newColumnIndex = orderedColumns.findIndex(c => c._id === over.id)
 
         const dndOrderedColumns = arrayMove(orderedColumns, oldColumnIndex, newColumnIndex)
-
         // xử lí gọi API
         // const dndOrderedColumnsIds = dndOrderedColumns.map(c => c._id)
         // console.log('dndOrderedColumns: ', dndOrderedColumns)
         // console.log('dndOrderedColumnsIds: ', dndOrderedColumnsIds)
+
+        /**
+         * gọi lên props function moveColumns nằm ở component cha cao nhất (board/._id.jsx)
+         * Lưu ý: học phần cao hơn sẽ đưa ra ngoài Redux Global Store
+         * Và lúc này có thể gọi luôn API ở đây là xong thay vì phải lần lượt gọi ngược lên những component cha ở phía bên trên (đối với component con nằm càng sâu thì càng khó)
+         * Với việc sử dụng Redux thì code sẽ clean chuẩn chỉnh hơn
+         */
+        moveColumns(dndOrderedColumns)
 
         // cập nhật lại state ban đầu sau khi đã kéo thả
         setOrderedColumns(dndOrderedColumns)
