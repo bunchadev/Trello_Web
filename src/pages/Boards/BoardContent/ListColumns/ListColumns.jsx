@@ -14,7 +14,7 @@ function ListColumns({ columns, createNewColumn, createNewCard }) {
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
 
   const [newColumnTitle, setNewColumnTitle] = useState('')
-  const addNewColumn = async () => {
+  const addNewColumn = () => {
     if (!newColumnTitle) {
       toast.error('Please enter column title')
       return
@@ -27,7 +27,7 @@ function ListColumns({ columns, createNewColumn, createNewCard }) {
      * gọi lên props function createNewColumn nằm ở component cha cao nhất (boards/_id.jsx)
      * lưu ý sau học cao sẽ đưa dữ liệu ra ngoài redux global store và lúc đấy có thể gọi luôn API ở đây là xong
      */
-    await createNewColumn(newColumnData)
+    createNewColumn(newColumnData)
 
     // đóng trang thái thêm column mới và clear input
     toggleOpenNewColumnForm()

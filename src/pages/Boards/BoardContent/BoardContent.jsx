@@ -1,7 +1,6 @@
 // tạo cấu trúc "rfce"
 import Box from '@mui/material/Box'
 import ListColumns from './ListColumns/ListColumns'
-import { mapOrder } from '~/utils/sorts'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { cloneDeep, isEmpty } from 'lodash'
 
@@ -32,7 +31,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
 
-function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
+function BoardContent({ board, createNewColumn, createNewCard, moveColumns, moveCardInTheSameColumn }) {
   // const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
 
   // yêu cầu di chuyển chuột 10px thì mới kích hoạt event, fix trường hợp click bị gọi event
@@ -56,7 +55,8 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
   const lastOverId = useRef(null)
 
   useEffect(() => {
-    setOrderedColumns(mapOrder(board?.columns, board?.columnOrderIds, '_id'))
+    // columns đã được sắp xếp ở component cha cao nhất
+    setOrderedColumns(board.columns)
   }, [board])
 
   // tìm 1 cái column theo cardId
@@ -231,7 +231,9 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
 
         // dùng arrayMove vì kéo card trong 1 cái column thì tương tự với logic kéo column trong 1 cái board content
         const dndOrderedCards = arrayMove(oldColumnWhenDraggingCard?.cards, oldCardIndex, newCardIndex)
+        const dndOrderedCardsIds = dndOrderedCards.map(card => card._id)
 
+        // Vẫn gọi update State ở đây để tránh delay hoặc Flickering giao diện lúc kéo thả cần phải chờ gọi API
         setOrderedColumns(prevColumns => {
           // clone mảng OrderedColumnState cũ ra 1 cái mới để xử lí data rồi return - cập nhật lại OrderedColumnState mới
           const nextColumns = cloneDeep(prevColumns)
@@ -241,11 +243,19 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
 
           // cập nhật lại 2 giá trị mới là card và cardOrderIds trong cái targetColumn
           targetColumn.cards = dndOrderedCards
-          targetColumn.cardOrderIds = dndOrderedCards.map(card => card._id)
+          targetColumn.cardOrderIds = dndOrderedCardsIds
 
           // trả về giá trị mới chuẩn vị trí
           return nextColumns
         })
+
+        /**
+         * gọi lên props function moveCardInTheSameColumn nằm ở component cha cao nhất (board/._id.jsx)
+         * Lưu ý: học phần cao hơn sẽ đưa ra ngoài Redux Global Store
+         * Và lúc này có thể gọi luôn API ở đây là xong thay vì phải lần lượt gọi ngược lên những component cha ở phía bên trên (đối với component con nằm càng sâu thì càng khó)
+         * Với việc sử dụng Redux thì code sẽ clean chuẩn chỉnh hơn
+         */
+        moveCardInTheSameColumn(dndOrderedCards, dndOrderedCardsIds, oldColumnWhenDraggingCard._id)
       }
     }
 
@@ -260,10 +270,9 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
         const newColumnIndex = orderedColumns.findIndex(c => c._id === over.id)
 
         const dndOrderedColumns = arrayMove(orderedColumns, oldColumnIndex, newColumnIndex)
-        // xử lí gọi API
-        // const dndOrderedColumnsIds = dndOrderedColumns.map(c => c._id)
-        // console.log('dndOrderedColumns: ', dndOrderedColumns)
-        // console.log('dndOrderedColumnsIds: ', dndOrderedColumnsIds)
+
+        // Vẫn gọi Update State ở đay để tránh delay hoặc Flickering giao diện lúc kéo thả cần phải chờ gọi API
+        setOrderedColumns(dndOrderedColumns)
 
         /**
          * gọi lên props function moveColumns nằm ở component cha cao nhất (board/._id.jsx)
@@ -273,8 +282,6 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
          */
         moveColumns(dndOrderedColumns)
 
-        // cập nhật lại state ban đầu sau khi đã kéo thả
-        setOrderedColumns(dndOrderedColumns)
       }
     }
 
@@ -329,7 +336,7 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
     // nếu overId là null nó sẽ trả về mảng rỗng
     return lastOverId.current ? [{ id: lastOverId.current }] : []
 
-  }, [activeDragItemType])
+  }, [activeDragItemType, orderedColumns])
 
   return (
     <DndContext
