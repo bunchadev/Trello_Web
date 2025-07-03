@@ -10,7 +10,8 @@ import {
   createNewColumnAPI,
   updateBoardDetailsAPI,
   updateColumnDetailsAPI,
-  moveCardToDifferentColumnAPI
+  moveCardToDifferentColumnAPI,
+  deleteColumnDetailsAPI
 } from '~/apis'
 // import { mockData } from '~/apis/mock-data'
 import { generatePlaceholderCard } from '~/utils/formatter'
@@ -19,6 +20,7 @@ import { mapOrder } from '~/utils/sorts'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import { Typography } from '@mui/material'
+import { toast } from 'react-toastify'
 
 function Board() {
   const [board, setBoard] = useState(null)
@@ -99,7 +101,6 @@ function Board() {
     // Gọi API update board
     updateBoardDetailsAPI(newBoard._id, { columnOrderIds: dndOrderedColumnsIds })
   }
-
   // khi di chuyển card trong cùng 1 column chỉ cần gọi API để cập nhật mảng cardOrderIds của column chứa nó (thay đổi vị trí trong mảng)
   const moveCardInTheSameColumn = (dndOrderedCards, dndOrderedCardsIds, columnId) => {
     // Update cho chuẩn dữ liệu State Board
@@ -142,6 +143,20 @@ function Board() {
     })
   }
 
+  // xử lý xóa column và cards bên trong nó
+  const deleteColumnDetails = (columnId) => {
+    // update cho chuẩn dữ liệu state board
+    const newBoard = { ...board }
+    newBoard.columns = newBoard.columns.filter(c => c._id !== columnId)
+    newBoard.columnOrderIds = newBoard.columnOrderIds.filter(_id => _id !== columnId)
+    setBoard(newBoard)
+
+    // gọi API xử lý phía BE
+    deleteColumnDetailsAPI(columnId).then(res => {
+      toast.success(res?.deleteResult, { position: 'top-center' })
+    })
+  }
+
   if (!board) {
     return (
       <Box sx={{
@@ -164,11 +179,13 @@ function Board() {
       <BoardBar board={board} />
       <BoardContent
         board={board}
+
         createNewColumn={createNewColumn}
         createNewCard={createNewCard}
         moveColumns={moveColumns}
         moveCardInTheSameColumn={moveCardInTheSameColumn}
         moveCardToDifferentColumn={moveCardToDifferentColumn}
+        deleteColumnDetails={deleteColumnDetails}
       />
     </Container>
   )
