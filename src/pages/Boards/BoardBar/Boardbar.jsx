@@ -2,7 +2,7 @@ import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import VpnLockIcon from '@mui/icons-material/VpnLock'
-import AddToDriveIcon from '@mui/icons-material/AddtoDrive'
+// import AddToDriveIcon from '@mui/icons-material/AddtoDrive'
 import BoltIcon from '@mui/icons-material/Bolt'
 import FilterIcon from '@mui/icons-material/FilterList'
 import Avatar from '@mui/material/Avatar'
@@ -62,12 +62,12 @@ function BoardBar({ board }) {
           clickable
         />
 
-        <Chip
+        {/* <Chip
           sx={MENU_STYLES}
           icon={<AddToDriveIcon />}
           label='Add to Google drive'
           clickable
-        />
+        /> */}
 
         <Chip
           sx={MENU_STYLES}
