@@ -13,7 +13,7 @@ export default defineConfig({
     svgr()
   ],
   // base: './'
-  // thay đổi đường dẫn tới thư mục 
+  // thay đổi đường dẫn tới thư mục
   resolve: {
     alias: [
       { find: '~', replacement: '/src' }
