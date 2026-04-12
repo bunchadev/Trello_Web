@@ -179,7 +179,6 @@ function Board() {
       <BoardBar board={board} />
       <BoardContent
         board={board}
-
         createNewColumn={createNewColumn}
         createNewCard={createNewCard}
         moveColumns={moveColumns}

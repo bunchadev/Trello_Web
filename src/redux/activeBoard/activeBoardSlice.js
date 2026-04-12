@@ -1,0 +1,76 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { API_ROOT } from '~/utils/constants'
+import axios from 'axios'
+import { generatePlaceholderCard } from '~/utils/formatter'
+import { isEmpty } from 'lodash'
+import { mapOrder } from '~/utils/sorts'
+
+// Khởi tạo giá trị State của 1 cái slice trong redux
+const initialState = {
+  currentActiveBoard: null
+}
+
+// Gọi api (bất đồng bộ) và cập nhật dữ liệu vào redux, dùng middleware createAsyncThunk đi kèm với extraReducers
+export const fetchBoardDetailsAPI = createAsyncThunk(
+  'activeBoard/fetchBoardDetailsAPI',
+  async (boardId) => {
+    const reponse = await axios.get(`${API_ROOT}/v1/boards/${boardId}`)
+    return reponse.data
+  }
+)
+
+export const activeBoardSlice = createSlice({
+  name: 'activeBoard',
+  initialState,
+  // Reducer là nơi để xử lý dữ liệu đồng bộ
+  reducers: {
+    // luôn cần cặp ngoặc {} trong reducer dù code bên trong có 1 dòng vì đầy là rule của redux
+    updateCurrentActiveBoard: (state, action) => {
+      // action.payload là chuẩn đặt tên nhận dữ liệu vào reducer, ở đây chúng ta gán cho nó 1 biến có nghĩa hơn
+      const board = action.payload
+
+      // Xử lý dữ liệu cần thiết
+
+      // update lại dữ liệu currentActiveBoard
+      state.currentActiveBoard = board
+    }
+  },
+
+  // ExtraReducers: Nơi xử lý dữ liệu bất đồng bộ
+  extraReducers: (builder) => {
+    builder.addCase(fetchBoardDetailsAPI.fulfilled, (state, action) => {
+      // action.payload là reponse.data trả về từ api
+      let board = action.payload
+
+      // xử lý dữ liệu cần thiết
+      // sắp xếp column xong đưa xuống component con
+      board.columns = mapOrder(board.columns, board.columnOrderIds, '_id')
+
+      board.columns.forEach(column => {
+        // xử lý kéo thả khi column rỗng
+        if (isEmpty(column.cards)) {
+          column.cards = [generatePlaceholderCard(column)]
+          column.cardOrderIds = [generatePlaceholderCard(column)._id]
+        } else {
+          // sắp xếp cards xong đưa xuống component con
+          column.cards = mapOrder(column.cards, column.cardOrderIds, '_id')
+        }
+      })
+
+      // update lại dữ liệu currentActiveBoard
+      state.currentActiveBoard = board
+    })
+  }
+})
+
+// Action là nơi dành cho các component bên dưới gọi bằng dispatch() tới nó để cập nhật lại dữ liệu thông qua reducer(chạy đồng bộ)
+// Ở trên không có properties action vì những cái action này sẽ được redux tạo tự động theo tên của reducer
+export const { updateCurrentActiveBoard } = activeBoardSlice.actions
+
+// selectors: các components bên dưới gọi bằng hook useSelector() để lấy dữ liệu trong kho redux store ra sử dụng
+export const selectCurrentActiveBoard = (state) => {
+  return state.activeBoard.currentActiveBoard
+}
+
+// file này tên là activeBoardSlice nhưng export 1 thứ tên là reducer
+export const activeBoardReducer = activeBoardSlice.reducer

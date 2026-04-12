@@ -107,7 +107,7 @@ function BoardContent({
         // xóa card ở cái column active
         nextActiveColumn.cards = nextActiveColumn.cards.filter(card => card._id !== activeDraggingCardId)
 
-        // thêm placeholderCard (1 card ẩn bên trong column) nếu card bị rỗng
+        // thêm placeholderCard (1 card ẩn bên trong column) nếu column bị rỗng
         if (isEmpty(nextActiveColumn.cards)) {
           nextActiveColumn.cards = [generatePlaceholderCard(nextActiveColumn)]
         }
