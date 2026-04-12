@@ -49,7 +49,7 @@ const theme = extendTheme({
           textTransform: 'none',
           // border
           borderWidth: '0.5px',
-          '&:hover': { borderWidth: '0.5px' }
+          '&:hover': { borderWidth: '1.5px' }
         }
       }
     },
@@ -75,7 +75,7 @@ const theme = extendTheme({
         root: {
           fontSize: '0.875rem',
           '& fieldset': { borderWidth: '0.5px !important' },
-          '&:hover fieldset': { borderWidth: '1px !important' },
+          '&:hover fieldset': { borderWidth: '1.5px !important' },
           '&.Mui-focused fieldset': { borderWidth: '1px !important' }
         }
       }

@@ -25,6 +25,12 @@ const MENU_STYLES = {
   }
 }
 
+const avatars = [
+  { title: 'duycuong', image: '434676690_442145844943398_3149193981518289588_n.jpg' },
+  { title: 'duycuong', image: '434676690_442145844943398_3149193981518289588_n.jpg' },
+  { title: 'duycuong', image: '434676690_442145844943398_3149193981518289588_n.jpg' }
+]
+
 function BoardBar({ board }) {
   return (
     <Box sx={{
@@ -117,21 +123,13 @@ function BoardBar({ board }) {
             }
           }}
         >
-          <Tooltip title='duycuong'>
-            <Avatar alt="Remy Sharp"
-              src='/images/434676690_442145844943398_3149193981518289588_n.jpg'
-            />
-          </Tooltip>
-          <Tooltip title='duycuong'>
-            <Avatar alt="Remy Sharp"
-              src='/images/434676690_442145844943398_3149193981518289588_n.jpg'
-            />
-          </Tooltip>
-          <Tooltip title='duycuong'>
-            <Avatar alt="Remy Sharp"
-              src='/images/434676690_442145844943398_3149193981518289588_n.jpg'
-            />
-          </Tooltip>
+          {avatars.map((avatar, index) => (
+            <Tooltip title={avatar.title} key={index}>
+              <Avatar
+                src={`/images/${avatar.image}`}
+              />
+            </Tooltip>
+          ))}
         </AvatarGroup>
       </Box>
     </Box>

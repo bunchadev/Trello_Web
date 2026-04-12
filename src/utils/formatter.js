@@ -16,4 +16,4 @@ export const generatePlaceholderCard = (column) => {
     comments: [],
     attachments: []
   }
-} 
+}
