@@ -8,13 +8,22 @@ import { useState } from 'react'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 import { toast } from 'react-toastify'
+import { createNewColumnAPI } from '~/apis'
+import { cloneDeep } from 'lodash'
+import { generatePlaceholderCard } from '~/utils/formatter'
+import { updateCurrentActiveBoard, selectCurrentActiveBoard } from '~/redux/activeBoard/activeBoardSlice'
+import { useDispatch, useSelector } from 'react-redux'
 
-function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDetails }) {
+function ListColumns({ columns }) {
+
+  const dispatch = useDispatch()
+  const board = useSelector(selectCurrentActiveBoard)
+
   const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
 
   const [newColumnTitle, setNewColumnTitle] = useState('')
-  const addNewColumn = () => {
+  const addNewColumn = async () => {
     if (!newColumnTitle) {
       toast.error('Please enter column title')
       return
@@ -23,11 +32,40 @@ function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDeta
     const newColumnData = {
       title: newColumnTitle
     }
+
+    // function này có nhiệm vụ gọi API tạo mới column và làm lại dữ liệu state board
+    const createdColumn = await createNewColumnAPI({
+      ...newColumnData,
+      boardId: board._id
+    })
+
+    // kéo thả card khi column rỗng
+    createdColumn.cards = [generatePlaceholderCard(createdColumn)]
+    createdColumn.cardOrderIds = [generatePlaceholderCard(createdColumn)._id]
+
+    // cập nhật state board
+    // phía FE chúng ta phải tự làm đúng lại state data board (thay vì phải gọi lại API fetchBoardDetailsApi)
+    // cách làm này phụ thuộc vào tùy lựa chọn và đặc thù dự án, có nơi thì BE sẽ hỗ trợ trả về luôn toàn bộ board đầy đủ có là API tạo column hay card (FE sẽ nhàn hơn)
+
     /**
-     * gọi lên props function createNewColumn nằm ở component cha cao nhất (boards/_id.jsx)
-     * lưu ý sau học cao sẽ đưa dữ liệu ra ngoài redux global store và lúc đấy có thể gọi luôn API ở đây là xong
+     * Đoạn này dính lỗi object is not extensible dù đã copy/clone giá trị newboard nhưng
+     * spread operator chỉ làm shallow copy nên dính rule Immutabbility trong redux không dùng
+     * được hàm push() (sửa giá trị mảng trực tiếp) nên sẽ dùng deep clone toàn bộ board
      */
-    createNewColumn(newColumnData)
+    // const newBoard = { ...board }
+    const newBoard = cloneDeep(board)
+    newBoard.columns.push(createdColumn)
+    newBoard.columnOrderIds.push(createdColumn._id)
+
+    /**
+     * Cách khác để tránh Immutability (tính bất biến) là dùng array.concat() nối mảng tạo ra mảng mới
+     * thay dùng push() (thay đổi giá trị trực tiếp trên mảng)
+    */
+    // const newBoard = { ...board }
+    // newBoard.columns = newBoard.columns.concat(createdColumn)
+    // newBoard.columnOrderIds = newBoard.columnOrderIds.concat(createdColumn._id)
+
+    dispatch(updateCurrentActiveBoard(newBoard))
 
     // đóng trang thái thêm column mới và clear input
     toggleOpenNewColumnForm()
@@ -49,12 +87,7 @@ function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDeta
         // thanh scroll thẳng với list card
         '&::-webkit-scrollbar-track': { m: 2 }
       }}>
-        {columns?.map(column => <Column
-          key={column._id}
-          column={column}
-          createNewCard={createNewCard}
-          deleteColumnDetails={deleteColumnDetails}
-        />)}
+        {columns?.map(column => <Column key={column._id} column={column} />)}
 
         {/* add new column */}
         {!openNewColumnForm
@@ -113,6 +146,7 @@ function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDeta
             />
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Button
+                className='interceptor-loading'
                 onClick={addNewColumn}
                 variant='contained' color='success' size='small'
                 sx={{
