@@ -19,18 +19,31 @@ import {
   PASSWORD_RULE_MESSAGE
 } from '~/utils/validators'
 import FieldErrorAlert from '~/components/Form/FieldErrorAlert'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import Alert from '@mui/material/Alert'
+import { toast } from 'react-toastify'
+import { useDispatch } from 'react-redux'
+import { loginUserApi } from '~/redux/user/userSlice'
+
 
 function LoginForm() {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const { handleSubmit, register, formState: { errors } } = useForm()
   let [searchParams] = useSearchParams()
   const registeredEmail = searchParams.get('registeredEmail')
   const verifiedEmail = searchParams.get('verifiedEmail')
 
   const submitLogIn = (data) => {
-    // eslint-disable-next-line no-console
-    console.log('submitLogin data:', data)
+    const { email, password } = data
+    toast.promise(dispatch(loginUserApi({ email, password })), {
+      pending: 'Logging in...'
+    }).then((res) => {
+      // console.log(res)
+      // Nếu login thành công thì điều hướng về trang dashboard
+      if (!res.error) { navigate('/') }
+    })
   }
   return (
     <form onSubmit={handleSubmit(submitLogIn)}>
