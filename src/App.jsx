@@ -30,7 +30,7 @@ function App() {
          * Ở đây cần replace giá trị true để nó thay thế route /, có thể hiểu route / sẽ không nằm
          * trong lịch sử trình duyệt nữa, thực hành trên trang 404 để thấy sự khác biệt
          */
-        <Navigate to='/boards/685644743e96ccf31f22e754' replace={true} />
+        <Navigate to='/boards/' replace={true} />
       } />
 
       {/* Protected Routes (Hiểu đơn giản trong dự án của chúng ta là những route chỉ cho truy cập sau khi đã login) */}
