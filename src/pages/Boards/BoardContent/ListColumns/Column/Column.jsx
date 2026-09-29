@@ -1,6 +1,5 @@
 // tạo cấu trúc "rfce"
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 import Button from '@mui/material/Button'
 import Menu from '@mui/material/Menu'
@@ -28,7 +27,8 @@ import { useConfirm } from 'material-ui-confirm'
 import { cloneDeep } from 'lodash'
 import { updateCurrentActiveBoard, selectCurrentActiveBoard } from '~/redux/activeBoard/activeBoardSlice'
 import { useDispatch, useSelector } from 'react-redux'
-import { createNewCardAPI, deleteColumnDetailsAPI } from '~/apis/index'
+import { createNewCardAPI, deleteColumnDetailsAPI, updateColumnDetailsAPI } from '~/apis/index'
+import ToggleFocusInput from '~/components/Form/ToggleFocusInput'
 
 function Column({ column }) {
   const dispatch = useDispatch()
@@ -129,6 +129,16 @@ function Column({ column }) {
     }).catch(() => { })
   }
 
+  const onUpdateColumnTitle = (newTitle) => {
+    updateColumnDetailsAPI(column._id, { title: newTitle }).then(() => {
+      const newBoard = cloneDeep(board)
+      const columnToUpdate = newBoard.columns.find(c => c._id === column._id)
+      if (columnToUpdate) {
+        columnToUpdate.title = newTitle
+      }
+      dispatch(updateCurrentActiveBoard(newBoard))
+    })
+  }
   return (
     // phải bọc div ở đây vì chiều cao của column khi kéo thả sẽ có bug Flickering
     <div ref={setNodeRef} style={dndKitColumnStyles} {...attributes} >
@@ -153,13 +163,20 @@ function Column({ column }) {
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          <Typography variant='h6' sx={{
+          {/* <Typography variant='h6' sx={{
             fontWeight: 'bold',
             cursor: 'pointer',
             fontSize: '1rem'
           }}>
             {column?.title}
-          </Typography>
+          </Typography> */}
+
+          <ToggleFocusInput
+            value={column?.title}
+            onChangedValue={onUpdateColumnTitle}
+            data-no-dnd="true"
+          />
+
           {/* prop down */}
           <Box>
             <Tooltip title='More options'>
