@@ -2,15 +2,14 @@ import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import VpnLockIcon from '@mui/icons-material/VpnLock'
-// import AddToDriveIcon from '@mui/icons-material/AddtoDrive'
 import BoltIcon from '@mui/icons-material/Bolt'
 import FilterIcon from '@mui/icons-material/FilterList'
-import Avatar from '@mui/material/Avatar'
-import AvatarGroup from '@mui/material/AvatarGroup'
 import Tooltip from '@mui/material/Tooltip'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import Button from '@mui/material/Button'
 import { capitalizeFirstLetter } from '~/utils/formatter'
+import BoardUserGroup from './BoardUserGroup'
+
 const MENU_STYLES = {
   color: 'white',
   bgcolor: 'transparent',
@@ -24,12 +23,6 @@ const MENU_STYLES = {
     bgcolor: 'primary.50'
   }
 }
-
-const avatars = [
-  { title: 'duycuong', image: '434676690_442145844943398_3149193981518289588_n.jpg' },
-  { title: 'duycuong', image: '434676690_442145844943398_3149193981518289588_n.jpg' },
-  { title: 'duycuong', image: '434676690_442145844943398_3149193981518289588_n.jpg' }
-]
 
 function BoardBar({ board }) {
   return (
@@ -68,13 +61,6 @@ function BoardBar({ board }) {
           clickable
         />
 
-        {/* <Chip
-          sx={MENU_STYLES}
-          icon={<AddToDriveIcon />}
-          label='Add to Google drive'
-          clickable
-        /> */}
-
         <Chip
           sx={MENU_STYLES}
           icon={<BoltIcon />}
@@ -108,29 +94,8 @@ function BoardBar({ board }) {
           Invite
         </Button>
 
-        <AvatarGroup
-          max={2}
-          sx={{
-            gap: '10px',
-            '& .MuiAvatar-root': {
-              width: '34px',
-              height: '34px',
-              fontSize: '16px',
-              border: 'none',
-              color: 'white',
-              cursor: 'pointer',
-              '&:first-of-type': { bgcolor: '#a4b0be' }
-            }
-          }}
-        >
-          {avatars.map((avatar, index) => (
-            <Tooltip title={avatar.title} key={index}>
-              <Avatar
-                src={`/images/${avatar.image}`}
-              />
-            </Tooltip>
-          ))}
-        </AvatarGroup>
+        {/* handle user group */}
+        <BoardUserGroup />
       </Box>
     </Box>
   )

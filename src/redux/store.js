@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { activeBoardReducer } from './activeBoard/activeBoardSlice'
 import { userReducer } from './user/userSlice'
+import { activeCardReducer } from './activeCard/activeCardSlice'
 
 
 /**
@@ -24,6 +25,7 @@ const rootPersistConfig = {
 // Combine các reducers trong dự án của chúng ta ở đây
 const reducers = combineReducers({
   activeBoard: activeBoardReducer,
+  activeCard: activeCardReducer,
   user: userReducer
 })
 
